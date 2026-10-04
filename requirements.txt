@@ -1,0 +1,4 @@
+pytest>=8,<9
+hypothesis>=6,<7
+coverage>=7,<8
+pycodestyle>=2,<3
