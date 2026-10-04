@@ -1,6 +1,6 @@
 PYTHON = .venv/bin/python
 
-.PHONY: install repl server demo test lint
+.PHONY: install repl repl-demo server demo test lint
 
 install:
 	python3 -m venv .venv
@@ -9,6 +9,9 @@ install:
 repl:
 	$(PYTHON) -m src.repl
 
+repl-demo:
+	$(PYTHON) -m src.repl < examples/repl_demo.txt
+
 server:
 	$(PYTHON) -m src.server
 
@@ -16,7 +19,9 @@ demo:
 	$(PYTHON) -m src.demo
 
 test:
-	$(PYTHON) -m coverage run --branch -m pytest -q
+	$(PYTHON) -m coverage run --branch \
+		--include='src/model.py,src/client.py,src/protocol.py,src/server.py' \
+		-m pytest -q
 	$(PYTHON) -m coverage report -m
 
 lint:

@@ -22,7 +22,7 @@ class ProtocolError(ValueError):
 
 
 def _body(payload: dict) -> bytes:
-    data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    data = json.dumps(payload, ensure_ascii=True).encode("utf-8")
     if len(data) > MAX_BODY_SIZE:
         raise ProtocolError("Тело сообщения слишком велико")
     return data

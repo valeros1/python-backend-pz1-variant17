@@ -1,0 +1,15 @@
+create_member {"ip":"127.0.0.1","locale":"ru","platform":"Linux","datetime":2000}
+get_members
+update_member {"identifier":1,"changes":{"locale":"en"}}
+create_query {"argument":"x","member":1,"description":"demo","executing":0,"datetime":2000}
+get_queries
+update_query {"identifier":1,"changes":{"executing":1}}
+create_response {"output":"ok","status":"done","exception":"","query":1,"cache_hit":0,"duration":2,"datetime":1580}
+get_responses
+update_response {"identifier":1,"changes":{"cache_hit":1}}
+select_recent_responses {"now":2000}
+delete_member {"identifier":1}
+delete_response {"identifier":1}
+delete_query {"identifier":1}
+delete_member {"identifier":1}
+exit

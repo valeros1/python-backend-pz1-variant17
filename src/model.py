@@ -114,9 +114,9 @@ def _changes(changes: dict, fields: dict[str, type]) -> dict:
 def create_member(ip: str, locale: str, platform: str,
                   datetime: int | None = None) -> Member:
     """Создать Member с новым идентификатором."""
-    record = Member(_new_id("member"), _stamp(datetime),
-                    _text(ip, "ip"), _text(locale, "locale"),
-                    _text(platform, "platform"))
+    values = (_stamp(datetime), _text(ip, "ip"),
+              _text(locale, "locale"), _text(platform, "platform"))
+    record = Member(_new_id("member"), *values)
     _members[record.identifier] = record
     return record
 
@@ -148,10 +148,10 @@ def create_query(argument: str, member: int, description: str,
                  executing: int, datetime: int | None = None) -> Query:
     """Создать Query, связанную с существующим Member."""
     _find(_members, member, "Member")
-    record = Query(_new_id("query"), _stamp(datetime),
-                   _text(argument, "argument"), member,
-                   _text(description, "description"),
-                   _integer(executing, "executing"))
+    values = (_stamp(datetime), _text(argument, "argument"), member,
+              _text(description, "description"),
+              _integer(executing, "executing"))
+    record = Query(_new_id("query"), *values)
     _queries[record.identifier] = record
     return record
 
@@ -187,12 +187,11 @@ def create_response(output: str, status: str, exception: str,
                     datetime: int | None = None) -> Response:
     """Создать Response, связанную с существующей Query."""
     _find(_queries, query, "Query")
-    record = Response(
-        _new_id("response"), _stamp(datetime),
-        _text(output, "output"), _text(status, "status"),
-        _text(exception, "exception"), query,
-        _integer(cache_hit, "cache_hit"), _integer(duration, "duration"),
-    )
+    values = (_stamp(datetime), _text(output, "output"),
+              _text(status, "status"), _text(exception, "exception"),
+              query, _integer(cache_hit, "cache_hit"),
+              _integer(duration, "duration"))
+    record = Response(_new_id("response"), *values)
     _responses[record.identifier] = record
     return record
 
@@ -237,7 +236,8 @@ def select_recent_responses(now: int | None = None
             rows.append((query, None))
     rows.extend((None, item) for item in _responses.values()
                 if item.identifier not in matched)
-    return [RecentResponse(query.argument if query else None,
-                           response.cache_hit, response.status)
-            for query, response in rows
-            if response is not None and response.datetime >= border]
+    projected = [RecentResponse(query.argument if query else None,
+                                response.cache_hit, response.status)
+                 for query, response in rows
+                 if response is not None and response.datetime >= border]
+    return list(dict.fromkeys(projected))
