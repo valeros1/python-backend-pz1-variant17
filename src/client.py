@@ -66,13 +66,9 @@ class RpcClient:
     def delete_query(self, identifier):
         return self._call("delete_query", identifier=identifier)
 
-    def create_response(self, output, status, exception, query, cache_hit,
-                        duration, datetime=None):
-        return self._call(
-            "create_response", output=output, status=status,
-            exception=exception, query=query, cache_hit=cache_hit,
-            duration=duration, datetime=datetime,
-        )
+    def create_response(self, fields):
+        """Передать поля Response как именованные параметры RPC."""
+        return self._call("create_response", **fields)
 
     def get_responses(self):
         return self._call("get_responses")

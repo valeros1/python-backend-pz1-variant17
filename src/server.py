@@ -80,7 +80,7 @@ def main():
     host = os.getenv("RPC_HOST", "127.0.0.1")
     port = int(os.getenv("RPC_PORT", "5017"))
     with RpcServer((host, port)) as server:
-        print(f"RPC сервер: {host}:{port}")
+        print("RPC сервер: {}:{}".format(host, port))
         try:
             server.serve_forever()
         except KeyboardInterrupt:

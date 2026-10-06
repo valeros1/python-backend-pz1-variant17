@@ -221,23 +221,33 @@ def delete_response(identifier: int) -> Response:
     return _responses.pop(record.identifier)
 
 
-def select_recent_responses(now: int | None = None
-                            ) -> list[RecentResponse]:
-    """Выполнить полное соединение, фильтр >= 7 минут и проекцию."""
-    border = _stamp(now) - RECENT_SECONDS
-    rows: list[tuple[Query | None, Response | None]] = []
+def _full_join_rows():
+    """Вернуть пары Query и Response, включая строки без пары."""
     matched: set[int] = set()
     for query in _queries.values():
         related = [item for item in _responses.values()
                    if item.query == query.identifier]
-        rows.extend((query, item) for item in related)
+        for item in related:
+            yield query, item
         matched.update(item.identifier for item in related)
         if not related:
-            rows.append((query, None))
-    rows.extend((None, item) for item in _responses.values()
-                if item.identifier not in matched)
-    projected = [RecentResponse(query.argument if query else None,
-                                response.cache_hit, response.status)
-                 for query, response in rows
-                 if response is not None and response.datetime >= border]
+            yield query, None
+    for item in _responses.values():
+        if item.identifier not in matched:
+            yield None, item
+
+
+def select_recent_responses(now: int | None = None
+                            ) -> list[RecentResponse]:
+    """Выполнить полное соединение, фильтр >= 7 минут и проекцию."""
+    border = _stamp(now) - RECENT_SECONDS
+    projected = []
+    for query, response in _full_join_rows():
+        if response is None or response.datetime < border:
+            continue
+        projected.append(RecentResponse(
+            query.argument if query else None,
+            response.cache_hit,
+            response.status,
+        ))
     return list(dict.fromkeys(projected))

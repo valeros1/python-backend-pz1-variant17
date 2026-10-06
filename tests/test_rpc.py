@@ -82,8 +82,11 @@ class RpcMachine(RuleBasedStateMachine):
             "datetime": NOW, "argument": argument, "member": member_id,
             "description": "seed", "executing": 0,
         }, query)
-        response = self.client.create_response("ok", status, "",
-                                               query_id, 0, 1, NOW - 420)
+        response = self.client.create_response({
+            "output": "ok", "status": status, "exception": "",
+            "query": query_id, "cache_hit": 0, "duration": 1,
+            "datetime": NOW - 420,
+        })
         self.remember("responses", {
             "datetime": NOW - 420, "output": "ok", "status": status,
             "exception": "", "query": query_id, "cache_hit": 0,
@@ -117,8 +120,11 @@ class RpcMachine(RuleBasedStateMachine):
         fields = {"datetime": timestamp, "output": "result",
                   "status": status, "exception": "", "query": query,
                   "cache_hit": cache_hit, "duration": 1}
-        result = self.client.create_response(
-            "result", status, "", query, cache_hit, 1, timestamp)
+        result = self.client.create_response({
+            "output": "result", "status": status, "exception": "",
+            "query": query, "cache_hit": cache_hit, "duration": 1,
+            "datetime": timestamp,
+        })
         self.remember("responses", fields, result)
 
     @precondition(lambda self: bool(self.rows["members"]))

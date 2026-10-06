@@ -3,6 +3,8 @@
 import json
 
 VERSION = 1
+MIN_OPCODE = 0
+MAX_OPCODE = 255
 REQUEST_HEADER_SIZE = 7
 RESPONSE_HEADER_SIZE = 5
 MAX_BODY_SIZE = 1024 * 1024
@@ -55,7 +57,7 @@ def _read_body(sock, count: int) -> dict:
 
 def pack_request(opcode: int, params: dict) -> bytes:
     """Собрать запрос: version(1), opcode(1), length(5), JSON."""
-    if not 0 <= opcode <= 255:
+    if not MIN_OPCODE <= opcode <= MAX_OPCODE:
         raise ProtocolError("Недопустимый код операции")
     body = _body(params)
     return bytes((VERSION, opcode)) + len(body).to_bytes(5, "big") + body
@@ -74,7 +76,7 @@ def read_request(sock) -> tuple[int, int, dict] | None:
 
 def pack_response(opcode: int, payload: dict) -> bytes:
     """Собрать ответ: length(4), opcode(1), JSON."""
-    if not 0 <= opcode <= 255:
+    if not MIN_OPCODE <= opcode <= MAX_OPCODE:
         raise ProtocolError("Недопустимый код операции")
     body = _body(payload)
     return len(body).to_bytes(4, "big") + bytes((opcode,)) + body

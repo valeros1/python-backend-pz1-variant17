@@ -22,10 +22,11 @@ def main():
         print("get_queries:", client.get_queries())
         print("update_query:", client.update_query(
             query["identifier"], {"executing": 1}))
-        response = client.create_response(
-            "2", "done", "", query["identifier"], 0, 12,
-            datetime=int(time.time()) - 420,
-        )
+        response = client.create_response({
+            "output": "2", "status": "done", "exception": "",
+            "query": query["identifier"], "cache_hit": 0,
+            "duration": 12, "datetime": int(time.time()) - 420,
+        })
         print("create_response:", response)
         print("get_responses:", client.get_responses())
         print("update_response:", client.update_response(
